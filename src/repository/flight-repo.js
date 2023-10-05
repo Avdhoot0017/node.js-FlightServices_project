@@ -1,6 +1,6 @@
 
 const crudRepository = require('./crud-repository');
-const { Flight  } = require('../models')
+const {Flight} = require('../models')
 
 
 
