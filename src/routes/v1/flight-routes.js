@@ -11,6 +11,8 @@ const { flightmiddleware }= require('../../middlewares');
 
 router.post('/', flightmiddleware.validateCreateRequest, flightcontroller.createFlight);
 
+router.get('/' , flightcontroller.getAllFlights);
+
 
 
 
