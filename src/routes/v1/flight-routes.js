@@ -13,6 +13,12 @@ router.post('/', flightmiddleware.validateCreateRequest, flightcontroller.create
 
 router.get('/' , flightcontroller.getAllFlights);
 
+router.get('/:id' , flightcontroller.getFlight);
+
+
+
+router.patch('/:id/seats',flightmiddleware.validateupdateseats,flightcontroller.updateSeats);
+
 
 
 

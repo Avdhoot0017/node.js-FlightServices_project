@@ -18,9 +18,30 @@ function validateCreateRequest(req,res,next){
 
 }
 
+function validateupdateseats(req,res,next)
+{
+    if(!req.body.seats){
+
+        errorresponce.message = 'something went wrong.......!';
+        errorresponce.error = new Apperror(["flight ID  not found"] , StatusCodes.BAD_REQUEST );
+       
+        return res.status(StatusCodes.BAD_REQUEST).json(errorresponce);
+    }
+
+
+    
+
+    next();
+
+
+
+}
+
 
 
 module.exports = {
 
-    validateCreateRequest
+    validateCreateRequest,
+    validateupdateseats
+    
 }

@@ -1,7 +1,11 @@
 
 const crudRepository = require('./crud-repository');
 const {Flight,Airplanes,Airport} = require('../models');
-const { Sequelize } = require('sequelize')
+const { Sequelize } = require('sequelize');
+const db = require('../models');
+
+const { addrowlock } = require('./queries');
+
 
 
 
@@ -55,6 +59,39 @@ class Flightrepo extends crudRepository {
         return responce;
 
     }
+
+    async updateremainingFlight(flightId,seats,dec = true)
+    {
+
+        await db.sequelize.query(addrowlock(flightId));
+
+
+        const flight = await Flight.findByPk(flightId);
+
+        if(+dec)
+        {
+            const responce = await flight.decrement('totalSeats',{by: seats});
+            return responce; 
+
+
+        }
+        else{
+
+            const responce = await flight.increment('totalSeats',{by: seats});
+            return responce;
+
+        }
+
+
+    }
+
+
+
 }
+
+
+
+
+
 
 module.exports = Flightrepo;

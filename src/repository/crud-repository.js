@@ -3,7 +3,7 @@ const { Logger }   = require('../config');
 const Apperror = require('../utils/errors/app-error');
 
 
-
+    
 class crudRepository{
 
     constructor(model)
