@@ -1,6 +1,6 @@
 
 const crudRepository = require('./crud-repository');
-const {Flight,Airplanes,Airport} = require('../models');
+const { Flight, Airplanes, Airport } = require('../models');
 const { Sequelize } = require('sequelize');
 const db = require('../models');
 
@@ -17,17 +17,15 @@ const { addrowlock } = require('./queries');
 
 class Flightrepo extends crudRepository {
 
-    constructor()
-    {
+    constructor() {
         super(Flight);
-    
+
 
     }
 
 
 
-    async getAllFlights(filter)
-    {
+    async getAllFlights(filter) {
         const responce = await Flight.findAll({
             where: filter,
             include: [{
@@ -39,7 +37,7 @@ class Flightrepo extends crudRepository {
                 as: 'DEparture_Airport_Details',
                 require: true,
                 on: {
-                    col1: Sequelize.where(Sequelize.col("Flight.departureAirportID"), "=" , Sequelize.col("DEparture_Airport_Details.code")) 
+                    col1: Sequelize.where(Sequelize.col("Flight.departureAirportID"), "=", Sequelize.col("DEparture_Airport_Details.code"))
 
                 }
             },
@@ -49,45 +47,56 @@ class Flightrepo extends crudRepository {
                 as: 'Arrival_Airport_Details',
                 require: true,
                 on: {
-                    col1: Sequelize.where(Sequelize.col("Flight.arrivalAirporId"), "=" , Sequelize.col("Arrival_Airport_Details.code")) 
+                    col1: Sequelize.where(Sequelize.col("Flight.arrivalAirporId"), "=", Sequelize.col("Arrival_Airport_Details.code"))
 
                 }
 
             }
-        ]
+            ]
         })
         return responce;
 
     }
 
-    async updateremainingFlight(flightId,seats,dec = true)
-    {
+    async updateremainingFlight(flightId, seats, dec = true) {
 
-        await db.sequelize.query(addrowlock(flightId));
+        const transaction = await db.sequelize.transaction();
 
+        try {
 
-        const flight = await Flight.findByPk(flightId);
+            await db.sequelize.query(addrowlock(flightId));
+             const flight = await Flight.findByPk(flightId);
+    
+            if (+dec) {
+                await flight.decrement('totalSeats', { by: seats }, { transaction: transaction });
+             }
+            else {
+                 await flight.increment('totalSeats', { by: seats }, { transaction: transaction });
+                }
+    
+            await transaction.commit();
+    
+            return flight;
+    
+    
+        
+            
+        } catch (error) {
 
-        if(+dec)
-        {
-            const responce = await flight.decrement('totalSeats',{by: seats});
-            return responce; 
-
+            await transaction.rollback();
+            throw error;
+            
+            
+        }
 
         }
-        else{
-
-            const responce = await flight.increment('totalSeats',{by: seats});
-            return responce;
-
-        }
-
 
     }
+       
 
 
 
-}
+
 
 
 
